@@ -1,0 +1,19 @@
+{
+  "name": "mmm-upcomingcards",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MMM-UpcomingCards standalone MagicMirror module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "check": "node scripts/check.cjs",
+    "test": "npm run check && node --test tests/*.test.cjs",
+    "test:calendar-integration": "node --test tests/integration/calendar-pipeline.test.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QuietNodeLab/MMM-UpcomingCards.git"
+  }
+}

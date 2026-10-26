@@ -1,0 +1,442 @@
+diff --git a/MMM-MonthlyCalendar.js b/MMM-MonthlyCalendar.js
+index afe4e88..d40cb4c 100644
+--- a/MMM-MonthlyCalendar.js
++++ b/MMM-MonthlyCalendar.js
+@@ -1,5 +1,373 @@
+ // MMM-MonthlyCalendar.js
+ 
++// community ADAPTIVE V2 START
++function communityAdaptiveFitV2(table) {
++  try {
++    if (!table.isConnected) return;
++
++    const rows = Array.from(table.querySelectorAll("tr"))
++      .filter(row => row.querySelector("td.cell"));
++
++    if (!rows.length) return;
++
++
++    // community CALENDAR PRIORITIES V1 START
++    // Priority: Family, SamplePerson, SampleCalendar1, School, PTA.
++    // Identify calendars by their established event colors.
++    function communityPriority(event) {
++      const title = event.textContent || "";
++
++      if (/\bsampleperson\b/i.test(title)) return 1;
++
++      const raw = (
++        event.style.backgroundColor ||
++        event.style.color ||
++        ""
++      ).trim().toLowerCase();
++
++      const names = {
++        yellow: 0,
++        gold: 0,
++        red: 1,
++        blue: 2,
++        orange: 3,
++        purple: 4
++      };
++
++      if (Object.prototype.hasOwnProperty.call(names, raw)) {
++        return names[raw];
++      }
++
++      let r, g, b;
++
++      if (raw.startsWith("#")) {
++        let hex = raw.slice(1);
++
++        if (hex.length === 3 || hex.length === 4) {
++          hex = hex.split("").map(c => c + c).join("");
++        }
++
++        if (hex.length !== 6 && hex.length !== 8) return 5;
++
++        r = parseInt(hex.slice(0, 2), 16);
++        g = parseInt(hex.slice(2, 4), 16);
++        b = parseInt(hex.slice(4, 6), 16);
++      } else {
++        const match = raw.match(
++          /rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/
++        );
++
++        if (!match) return 5;
++
++        r = Number(match[1]);
++        g = Number(match[2]);
++        b = Number(match[3]);
++      }
++
++      if (![r, g, b].every(Number.isFinite)) return 5;
++
++      const max = Math.max(r, g, b);
++      const min = Math.min(r, g, b);
++      const delta = max - min;
++
++      if (delta < 15) return 5;
++
++      let hue;
++
++      if (max === r) {
++        hue = 60 * (((g - b) / delta) % 6);
++      } else if (max === g) {
++        hue = 60 * ((b - r) / delta + 2);
++      } else {
++        hue = 60 * ((r - g) / delta + 4);
++      }
++
++      hue = (hue + 360) % 360;
++
++      if (hue >= 40 && hue < 80) return 0;   // Family: yellow
++      if (hue < 15 || hue >= 340) return 1;    // SamplePerson: red
++      if (hue >= 185 && hue < 265) return 2;  // SampleCalendar1: blue
++      if (hue >= 15 && hue < 40) return 3;    // School: orange
++      if (hue >= 265 && hue < 340) return 4;  // PTA: purple
++
++      return 5;
++    }
++
++    // Sort every day's events before adaptive height measurements.
++    // Preserve original chronological order within each priority.
++    rows.forEach(row => {
++      row.querySelectorAll("td.cell").forEach(cell => {
++        const events = Array.from(
++          cell.querySelectorAll(":scope > .event")
++        );
++
++        const ordered = events
++          .map((event, index) => ({
++            event,
++            index,
++            priority: communityPriority(event)
++          }))
++          .sort((a, b) =>
++            a.priority - b.priority || a.index - b.index
++          );
++
++        // community EVENT ORDER FIX V1
++        // Keep the +more button AFTER all event cards.
++        // This ensures the first event remains beside the date.
++        const moreIndicator = cell.querySelector(
++          ":scope > .community-adaptive-more"
++        );
++        ordered.forEach(item =>
++          cell.insertBefore(item.event, moreIndicator)
++        );
++      });
++    });
++    // community CALENDAR PRIORITIES V1 END
++
++    // community DATE SIDE BY SIDE V1
++    // Measure the date label so the first event sits beside it.
++    rows.forEach(row => {
++      row.querySelectorAll("td.cell").forEach(cell => {
++        const date = cell.firstElementChild;
++        if (!date) return;
++        const width = Math.ceil(date.getBoundingClientRect().width);
++        const measured = Math.max(28, width + 9);
++        cell.style.setProperty(
++          "--community-date-space",
++          measured + "px"
++        );
++      });
++    });
++
++    const eventSize = event => {
++      const s = getComputedStyle(event);
++      return event.getBoundingClientRect().height +
++        (parseFloat(s.marginTop) || 0) +
++        (parseFloat(s.marginBottom) || 0);
++    };
++
++    const dateSize = cell => {
++      const date = cell.firstElementChild;
++      if (!date) return 24;
++      const s = getComputedStyle(date);
++      if (s.position === "absolute") return 0;
++      return date.getBoundingClientRect().height +
++        (parseFloat(s.marginBottom) || 0);
++    };
++
++    // Reset this calendar's previous adaptive measurements.
++    table.querySelectorAll(".community-adaptive-more")
++      .forEach(button => button.remove());
++
++    rows.forEach(row => {
++      row.classList.remove("community-tight-week");
++      row.querySelectorAll(".event").forEach(event => {
++        event.style.removeProperty("display");
++      });
++    });
++
++    const available = table.clientHeight;
++    if (available < 150) return;
++
++    const header = 30;
++    const space = available - header - 2;
++    const minimum = Math.min(44, space / rows.length);
++
++    // Measure the actual event content for each week.
++    const demand = rows.map(row => {
++      let required = minimum;
++
++      row.querySelectorAll("td.cell").forEach(cell => {
++        const s = getComputedStyle(cell);
++        const padding =
++          (parseFloat(s.paddingTop) || 0) +
++          (parseFloat(s.paddingBottom) || 0);
++
++        const events = Array.from(cell.querySelectorAll(".event"));
++        const needed = padding + dateSize(cell) + 3 +
++          events.reduce((sum, event) => sum + eventSize(event), 0);
++
++        required = Math.max(required, needed);
++      });
++
++      return required;
++    });
++
++    const totalDemand = demand.reduce((a, b) => a + b, 0);
++    let heights;
++
++    if (totalDemand <= space) {
++      // All events can fit: share remaining space evenly.
++      const extra = (space - totalDemand) / rows.length;
++      heights = demand.map(value => value + extra);
++    } else {
++      // Busy month: give more space to the busiest weeks.
++      const extraDemand = demand.map(value =>
++        Math.max(0, value - minimum)
++      );
++      const totalExtra = extraDemand.reduce((a, b) => a + b, 0);
++      const remaining = Math.max(0, space - minimum * rows.length);
++
++      heights = extraDemand.map(value =>
++        minimum + (totalExtra ? remaining * value / totalExtra : 0)
++      );
++    }
++
++    table.style.setProperty(
++      "grid-template-rows",
++      header + "px " +
++      heights.map(value => value.toFixed(2) + "px").join(" "),
++      "important"
++    );
++
++    // Use compact titles only in weeks that need them.
++    rows.forEach((row, index) => {
++      if (demand[index] > heights[index] + 3) {
++        row.classList.add("community-tight-week");
++      }
++    });
++
++    // Fit events after the adaptive row sizes have been applied.
++    rows.forEach(row => {
++      row.querySelectorAll("td.cell").forEach(cell => {
++        const events = Array.from(cell.querySelectorAll(".event"));
++        if (!events.length) return;
++
++        const s = getComputedStyle(cell);
++        const padding =
++          (parseFloat(s.paddingTop) || 0) +
++          (parseFloat(s.paddingBottom) || 0);
++
++        const usable = Math.max(
++          0,
++          cell.clientHeight - padding - dateSize(cell) - 3
++        );
++
++        const sizes = events.map(eventSize);
++        const required = sizes.reduce((a, b) => a + b, 0);
++
++        if (required <= usable + 1) return;
++
++        // Reserve room for a visible +more indicator.
++        const budget = Math.max(0, usable - 19);
++        let used = 0;
++        let hidden = 0;
++
++        events.forEach((event, index) => {
++          if (used + sizes[index] <= budget + 1) {
++            used += sizes[index];
++          } else {
++            event.style.setProperty("display", "none", "important");
++            hidden++;
++          }
++        });
++
++        // community COMPACT OVERFLOW FIX V2
++        // Keep at least the highest-priority event visible if
++        // its cell has enough space for one compact card.
++        if (hidden === events.length &&
++            events.length > 0 && usable >= 22) {
++          events[0].style.removeProperty("display");
++          hidden--;
++        }
++
++        if (!hidden) return;
++
++        const more = document.createElement("button");
++        more.type = "button";
++        more.className = "community-adaptive-more";
++        more.textContent = "+" + hidden + " more";
++
++        more.onclick = () => {
++          document.querySelector(".community-adaptive-overlay")?.remove();
++
++          const overlay = document.createElement("div");
++          overlay.className = "community-adaptive-overlay";
++
++          const panel = document.createElement("div");
++          panel.className = "community-adaptive-panel";
++
++          const title = document.createElement("h2");
++          title.textContent = "Events — " +
++            (cell.firstElementChild?.textContent || "Day");
++
++          const close = document.createElement("button");
++          close.className = "community-adaptive-close";
++          close.textContent = "Close ×";
++          close.onclick = () => overlay.remove();
++
++          panel.append(title, close);
++
++          events.forEach(event => {
++            const item = document.createElement("div");
++            item.className = "community-adaptive-item";
++            item.textContent = event.textContent.trim();
++            item.style.borderLeftColor = getComputedStyle(event).color;
++            panel.appendChild(item);
++          });
++
++          overlay.appendChild(panel);
++          overlay.onclick = e => {
++            if (e.target === overlay) overlay.remove();
++          };
++
++          document.body.appendChild(overlay);
++        };
++
++        cell.appendChild(more);
++      });
++    });
++
++
++    // community VISIBLE FIRST ALIGN V2 START
++    // Run AFTER priority sorting and event hiding.
++    // Mark the first event that is actually visible.
++    rows.forEach(row => {
++      row.querySelectorAll("td.cell").forEach(cell => {
++        const events = Array.from(
++          cell.querySelectorAll(":scope > .event")
++        );
++
++        events.forEach(event => {
++          event.classList.remove("community-first-visible-v2");
++        });
++
++        const firstVisible = events.find(event =>
++          window.getComputedStyle(event).display !== "none"
++        );
++
++        const dateLabel = cell.firstElementChild;
++
++        if (firstVisible && dateLabel) {
++          const dateWidth =
++            dateLabel.getBoundingClientRect().width;
++
++          // Account for date width and a small visual gap.
++          const space = Math.max(
++            24,
++            Math.ceil(dateWidth) + 9
++          );
++
++          cell.style.setProperty(
++            "--community-visible-date-space",
++            space + "px"
++          );
++
++          firstVisible.classList.add(
++            "community-first-visible-v2"
++          );
++        }
++      });
++    });
++    // community VISIBLE FIRST ALIGN V2 END
++
++    table.dataset.communityAdaptive = "v2";
++  } catch (error) {
++    console.warn("community Adaptive Calendar V2:", error);
++  }
++}
++// community ADAPTIVE V2 END
++
+ function el(tag, options) {
+   var result = document.createElement(tag);
+ 
+@@ -285,6 +653,10 @@ Module.register("MMM-MonthlyCalendar", {
+ 
+         if (dayDiff in dateCells) {
+           let div = el("div", { "className": "event" });
++          // community SAMPLEPERSON COMPACT V1
++          if (!e.fullDayEvent && /^sampleperson$/i.test((e.title || "").trim())) {
++            div.classList.add("community-sampleperson-compact");
++          }
+           if (!self.config.wrapTitles) {
+             div.classList.add("event-nowrap");
+           }
+@@ -292,16 +664,30 @@ Module.register("MMM-MonthlyCalendar", {
+           // Print the time if it is NOT a full day event.
+           // And if it is NOT the 2nd or later day of a multi-day event.
+           if (!e.fullDayEvent && !(e.multiDayEvent && (eventDate > e.startDate))) {
+-            div.appendChild(el("span", { "className": "event-label", "innerText": formatEventTime(e.startDate) }));
++            div.appendChild(el("span", { "className": "event-label", "innerText": formatEventTime(e.startDate) + " – " + formatEventTime(e.endDate) }));
+           }
+ 
++          // community TWO-LINE TITLES V1
++          let eventDetails = el("div", { "className": "community-event-details" });
+           if (self.config.displaySymbol) {
+             for (let symbol of e.symbol) {
+-              div.appendChild(el("span", { "className": `event-label fa fa-${symbol}` }));
++              eventDetails.appendChild(el("span", { "className": `event-label fa fa-${symbol}` }));
+             }
+           }
+ 
+-          div.appendChild(el("span", { "innerText": e.title }));
++          eventDetails.appendChild(el("span", { "className": "community-event-title", "innerText": e.title }));
++          div.appendChild(eventDetails);
++
++          // community SAMPLEPERSON INLINE V2
++          // Render SamplePerson's timed shifts as one text node.
++          if (div.classList.contains("community-sampleperson-compact")) {
++            div.textContent =
++              formatEventTime(e.startDate) +
++              " – " +
++              formatEventTime(e.endDate) +
++              " " +
++              e.title;
++          }
+ 
+           // Print ending time if last day of multi-day event.
+           if (e.multiDayEvent && (eventDate.toDateString() == e.endDate.toDateString())) {
+@@ -328,6 +714,18 @@ Module.register("MMM-MonthlyCalendar", {
+       }
+     }
+ 
++    // community ADAPTIVE V2 RENDER HOOK
++    [150, 700, 1800].forEach(delay => {
++      setTimeout(() => {
++        if (table.isConnected) {
++          communityAdaptiveFitV2(table);
++        }
++      }, delay);
++    });
+     return table;
+   },
+ });
++
++
++
++

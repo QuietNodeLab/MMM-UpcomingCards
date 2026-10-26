@@ -1,0 +1,14 @@
+{
+  "magicmirror": {
+    "commit": "f138f5b690ceab6450f55c852ac81d268363f563"
+  },
+  "modules": [
+    {
+      "name": "MMM-MonthlyCalendar",
+      "url": "https://github.com/kolbyjack/MMM-MonthlyCalendar.git",
+      "commit": "dadcd2c188daf305b45065fc17dfb1f250ac2e59",
+      "active": true,
+      "patch": "tests/integration/fixtures/MMM-MonthlyCalendar.patch"
+    }
+  ]
+}

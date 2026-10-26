@@ -1,0 +1,281 @@
+.MMM-UpcomingCards .uc-card {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--mm-glass-bg, rgba(24, 36, 54, 0.66));
+  border: 1px solid var(--mm-glass-border, rgba(235, 244, 255, 0.34));
+  border-radius: 15px;
+  padding: 10px 13px 8px;
+  backdrop-filter: blur(10px) saturate(125%);
+  -webkit-backdrop-filter: blur(10px) saturate(125%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+
+.MMM-UpcomingCards .uc-heading {
+  font-size: 15px;
+  letter-spacing: 0.6px;
+  text-align: center;
+  font-weight: 800;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.23);
+}
+
+.MMM-UpcomingCards .uc-list {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.MMM-UpcomingCards .uc-row {
+  min-height: 0;
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.MMM-UpcomingCards .uc-row:last-child {
+  border-bottom: 0;
+}
+
+.MMM-UpcomingCards .uc-detail {
+  flex: 1;
+  min-width: 0;
+  padding-left: 10px;
+  border-left: 3px solid #e6bb4e;
+}
+
+.MMM-UpcomingCards .uc-title {
+  font-size: clamp(12px, 0.95vw, 15px);
+  font-weight: 750;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.MMM-UpcomingCards .uc-sub {
+  font-size: clamp(10px, 0.72vw, 12px);
+  color: rgba(235, 244, 255, 0.82);
+  line-height: 1.1;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.MMM-UpcomingCards .uc-when {
+  flex: 0 0 72px;
+  font-size: clamp(10px, 0.77vw, 12px);
+  text-align: right;
+  color: rgba(240, 247, 255, 0.9);
+  white-space: nowrap;
+}
+
+.MMM-UpcomingCards .uc-days {
+  flex: 0 0 48px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  border-right: 2px solid #e4bc4e;
+}
+
+.MMM-UpcomingCards .uc-days strong {
+  font-size: clamp(18px, 1.4vw, 25px);
+  font-weight: 800;
+}
+
+.MMM-UpcomingCards .uc-days small {
+  font-size: 10px;
+  margin-top: 3px;
+}
+
+.MMM-UpcomingCards .uc-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: rgba(240, 247, 255, 0.75);
+}
+
+/* module BIRTHDAY GRID V2 START */
+
+/* Six birthdays: two columns and three rows. */
+.MMM-UpcomingCards .mode-birthdays .uc-list {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 3px 8px !important;
+  align-content: stretch !important;
+  min-height: 0 !important;
+}
+
+/* Compact individual birthday entries. */
+.MMM-UpcomingCards .mode-birthdays .uc-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 1px 2px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-sizing: border-box !important;
+}
+
+/* Countdown number stays close to the name. */
+.MMM-UpcomingCards .mode-birthdays .uc-days {
+  flex: 0 0 34px !important;
+  min-width: 34px !important;
+  border-right: 2px solid #e4bc4e !important;
+  padding-right: 4px !important;
+  box-sizing: border-box !important;
+}
+
+.MMM-UpcomingCards .mode-birthdays .uc-days strong {
+  font-size: clamp(15px, 1.2vw, 20px) !important;
+  line-height: 1 !important;
+}
+
+.MMM-UpcomingCards .mode-birthdays .uc-days small {
+  font-size: 9px !important;
+  margin-top: 1px !important;
+}
+
+/* Name and birthday date. */
+.MMM-UpcomingCards .mode-birthdays .uc-detail {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  padding-left: 4px !important;
+  border-left: 0 !important;
+}
+
+.MMM-UpcomingCards .mode-birthdays .uc-title {
+  font-size: clamp(11px, 0.87vw, 14px) !important;
+  line-height: 1.1 !important;
+  font-weight: 750 !important;
+}
+
+.MMM-UpcomingCards .mode-birthdays .uc-sub {
+  font-size: clamp(9px, 0.7vw, 11px) !important;
+  line-height: 1.1 !important;
+  margin-top: 2px !important;
+}
+
+/* Improve readability in Coming Up. */
+.MMM-UpcomingCards .mode-comingup .uc-title {
+  font-size: clamp(14px, 1.08vw, 18px) !important;
+  line-height: 1.13 !important;
+}
+
+.MMM-UpcomingCards .mode-comingup .uc-sub {
+  font-size: clamp(12px, 0.88vw, 15px) !important;
+  line-height: 1.15 !important;
+}
+
+.MMM-UpcomingCards .mode-comingup .uc-when {
+  font-size: clamp(11px, 0.85vw, 14px) !important;
+  flex-basis: 76px !important;
+}
+
+/* Keep both cards inside their existing footprint. */
+.MMM-UpcomingCards .uc-card {
+  overflow: hidden !important;
+}
+
+/* module BIRTHDAY GRID V2 END */
+
+/* module COMING UP COLUMNS V3 START */
+
+.MMM-UpcomingCards .mode-comingup .uc-event-row {
+  display: grid !important;
+  grid-template-columns: 3px minmax(0, 1.4fr) minmax(0, 1fr) 70px !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 2px 0 !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.MMM-UpcomingCards .mode-comingup .uc-event-color {
+  width: 3px !important;
+  height: 80% !important;
+  background: #e6bd50;
+  border-radius: 2px;
+}
+
+.MMM-UpcomingCards .mode-comingup .uc-event-name {
+  font-size: clamp(12px, 0.94vw, 15px) !important;
+  font-weight: 750 !important;
+  color: #fff !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
+}
+
+.MMM-UpcomingCards .mode-comingup .uc-event-time {
+  font-size: clamp(10px, 0.78vw, 13px) !important;
+  color: rgba(240, 247, 255, 0.93) !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
+}
+
+.MMM-UpcomingCards .mode-comingup .uc-event-when {
+  font-size: clamp(10px, 0.77vw, 13px) !important;
+  color: rgba(240, 247, 255, 0.93) !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+}
+
+/* module COMING UP COLUMNS V3 END */
+
+.MMM-UpcomingCards .uc-card {
+  width: 480px;
+  max-width: 100%;
+  min-height: 140px;
+  height: auto;
+}
+.MMM-UpcomingCards .uc-row {
+  min-height: 42px;
+  flex: 0 0 auto;
+}
+.MMM-UpcomingCards .mode-birthdays .uc-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(52px, auto);
+  grid-template-rows: none !important;
+}
+@media (max-width: 600px) {
+  .MMM-UpcomingCards .uc-card {
+    padding: 10px;
+    width: 100%;
+  }
+  .MMM-UpcomingCards .uc-event-row {
+    grid-template-columns: 3px minmax(0, 1fr) 65px !important;
+  }
+  .MMM-UpcomingCards .uc-event-time {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .MMM-UpcomingCards .uc-event-when {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+  .MMM-UpcomingCards .uc-title {
+    font-size: 14px;
+  }
+}

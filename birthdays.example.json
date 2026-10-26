@@ -1,0 +1,9 @@
+{
+  "people": [
+    {
+      "name": "Sample Person",
+      "date": "2000-02-28",
+      "note": "Have a wonderful day!"
+    }
+  ]
+}
